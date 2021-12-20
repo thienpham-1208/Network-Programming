@@ -10,18 +10,18 @@ import action.JoinAction.ClientType;
 import action.Action;
 
 
-public abstract class Client {
-	
-
+public abstract class Client 
+{
 	protected Socket socket = null;
 	protected ObjectInputStream in = null;
 	protected ObjectOutputStream out = null;
 	protected String location;
 	ClientType clientType;
 	
-	
-	public Client(ClientType clientType, String location) {
-		try {		
+	public Client(ClientType clientType, String location) 
+	{
+		try 
+		{		
 			this.socket = new Socket("localhost", Config.PORT);
 		
 			this.clientType = clientType;
@@ -32,42 +32,59 @@ public abstract class Client {
 			this.in = new ObjectInputStream(this.socket.getInputStream());	
 			this.location = location;	
 				
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}	
 	
-	public String getLocation() {
+	public String getLocation() 
+	{
 		return this.location;
 	}
 	
-	public void close() {
-		try {
+	public void close() 
+	{
+		try 
+		{
 			in.close();
 			out.close();
 			socket.close();
-		} catch(IOException e) {
+		} 
+		catch(IOException e)
+		{
 			e.printStackTrace();
 		}
 	}
 	
-	public void sendAction(Action act) {
-		try {
+	public void sendAction(Action act) 
+	{
+		try 
+		{
 			out.writeObject(act);
 			out.flush();
-		} catch(IOException e) {
+		} 
+		catch(IOException e) 
+		{
 			e.printStackTrace();
 		}
 	}
 	
-	public Action receiveAction() {
+	public Action receiveAction() 
+	{
 		Action act = null;
-		try {
+		try 
+		{
 			act = (Action) this.in.readObject();			
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
+		} 
+		catch (ClassNotFoundException e) 
+		{
 			e.printStackTrace();
 		}
 		return act;

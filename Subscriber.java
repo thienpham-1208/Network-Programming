@@ -12,52 +12,70 @@ import action.UnsubcriptionAction;
 import action.JoinAction.ClientType;
 
 
-public class Subscriber extends Client{
+public class Subscriber extends Client
+{
 	
-	public Subscriber(ClientType clientType, String location) {
+	public Subscriber(ClientType clientType, String location) 
+	{
 		super(clientType, location);		
 	}	
 	
-	public void process() {
+	public void process() 
+	{
 		Action act = receiveAction();		
 		
-		if (!(act instanceof ReplyJoinAction)) {
+		if (!(act instanceof ReplyJoinAction)) 
+		{
 			return;
 		}
 		ReplyJoinAction reply = (ReplyJoinAction) act;
 		
-		if (!(reply.getState() == 0)) {
+		if (!(reply.getState() == 0)) 
+		{
 			System.out.println(Config.messageToClient.get(reply.getState()));
 			close();
-		} else {		
+		} 
+		else 
+		{		
 			System.out.println(Config.messageToClient.get(reply.getState()));
-			while (true) {
-				try {
+			while (true) 
+			{
+				try 
+				{
 					Action action = (Action) in.readObject();
-					if (action instanceof PublishDataAction) {
+					if (action instanceof PublishDataAction) 
+					{
 						PublishDataAction updateData = (PublishDataAction) action;
 						System.out.println(updateData.getData());			
-					} else if (action instanceof UnsubcriptionAction) {
+					} 
+					else if (action instanceof UnsubcriptionAction) 
+					{
 						UnsubcriptionAction mess = (UnsubcriptionAction) action;
 						System.out.println(mess.getMessage());
 						close();						
 					}
-				} catch(IOException e) {
+				} 
+				catch(IOException e) 
+				{
 					e.printStackTrace();
-				} catch(ClassNotFoundException e) {
+				} 
+				catch(ClassNotFoundException e) 
+				{
 					e.printStackTrace();
 				}
 			}
 		}	
 	}
 	
-	public void quit() {
+	public void quit() 
+	{
 		String msg = "quit action from sub " + socket.getLocalPort();	
 		sendAction(new UnsubcriptionAction(msg));
 		close();	
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) 
+	{
 		String location = "hello";
 		Subscriber pub = new Subscriber(ClientType.SUBSCRIBER, location);
 		pub.process();

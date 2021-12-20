@@ -6,9 +6,8 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 
-public class ClientHandler extends Thread {
-	
-
+public class ClientHandler extends Thread 
+{
 	protected Socket socket = null;	
 	
 	protected ObjectInputStream in = null;
@@ -19,7 +18,8 @@ public class ClientHandler extends Thread {
 	
 	protected String location;
 	
-	public ClientHandler(long id, Socket socket, ObjectInputStream in, ObjectOutputStream out, String location) {
+	public ClientHandler(long id, Socket socket, ObjectInputStream in, ObjectOutputStream out, String location) 
+	{
 		this.id = id;
 		this.socket = socket;
 		this.in = in;
@@ -27,25 +27,30 @@ public class ClientHandler extends Thread {
 		this.location = location;
 	}
 	
-	public void setId(long id) {
+	public void setId(long id) 
+	{
 		this.id = id;
 	}
 	
-	public long getId() {
+	public long getId() 
+	{
 		return this.id;
 	}
 	
 	@Override
-	public void run() {
+	public void run() 
+	{
 			
 	}
 	
-	public String getLocation() {
+	public String getLocation() 
+	{
 		return this.location;
 	}
 	
 	@Override
-	public int hashCode() {
+	public int hashCode() 
+	{
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (int) (id ^ (id >>> 32));
@@ -53,7 +58,8 @@ public class ClientHandler extends Thread {
 	}
 	
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(Object obj) 
+	{
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -66,18 +72,23 @@ public class ClientHandler extends Thread {
 		return true;
 	}
 	
-	public void close() {
-		try {
+	public void close() 
+	{
+		try 
+		{
 			socket.close();
 			in.close();
 			out.close();
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			e.printStackTrace();
 		} 
 	}
 	
 	@Override
-	public String toString() {
+	public String toString() 
+	{
 		return id + " " + location;
 	}
 }

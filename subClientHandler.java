@@ -11,50 +11,66 @@ import action.JoinAction.ClientType;
 
 import java.io.IOException;
 
-public class subClientHandler extends ClientHandler {	
+public class subClientHandler extends ClientHandler 
+{	
 	
-	public subClientHandler(long id, Socket socket, ObjectInputStream in, ObjectOutputStream out, String location) {
+	public subClientHandler(long id, Socket socket, ObjectInputStream in, ObjectOutputStream out, String location) 
+	{
 		super(id, socket, in, out, location);
 		// TODO Auto-generated constructor stub		
 	}
 	
-	public ObjectOutputStream getOut() {
+	public ObjectOutputStream getOut() 
+	{
 		return this.out;
 	}
 	
 	@Override
-	public void run() {
-		while (true) {			
-			try {
+	public void run() 
+	{
+		while (true) 
+		{			
+			try 
+			{
 				Object act = this.in.readObject();
-				if (act == null || !(act instanceof UnsubcriptionAction)) {
+				if (act == null || !(act instanceof UnsubcriptionAction)) 
+				{
 					continue;
 				}
 				Thread.sleep(Config.SLEEP_TIME);
-			} catch (IOException e) {
+			} 
+			catch (IOException e) 
+			{
 				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
+			} 
+			catch (ClassNotFoundException e) 
+			{
 				e.printStackTrace();
-			} catch (InterruptedException  e) {				
+			} 
+			catch (InterruptedException  e) 
+			{				
 			}			
 		}
 					
 	}
 	
-	public void sendAction(Action act) {
-		try {
+	public void sendAction(Action act) 
+	{
+		try 
+		{
 			out.writeObject(act);
 			out.flush();
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			e.printStackTrace();
 		}
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) 
+	{
 		String location = "hi";
 		Subscriber pub = new Subscriber(ClientType.SUBSCRIBER, location);
 		pub.process();
-	}	
-
-
+	}
 }

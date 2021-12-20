@@ -19,8 +19,8 @@ import action.JoinAction;
 import action.JoinAction.ClientType;
 import action.ReplyJoinAction;
 
-public class Broker extends ServerUI {	
-	
+public class Broker extends ServerUI 
+{	
 	private ClientHandler[] clientHandlers = new ClientHandler[Config.MAX_CONNECTIONS];
 	
 	private ServerSocket serverSocket = null;	
@@ -31,22 +31,30 @@ public class Broker extends ServerUI {
 	
 	private long id;
 	
-	public Broker() {		
+	public Broker() 
+	{		
 		initialize();		
 	}
 	
-	public void process() {
-		try {
+	public void process() 
+	{
+		try 
+		{
 			this.serverSocket = new ServerSocket(Config.PORT);
 			updateMessage("Init server at port " + serverSocket.getLocalPort());
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			e.printStackTrace();
 		}
 	}
 	
-	public void listen() {
-		while (true) {
-			try {
+	public void listen() 
+	{
+		while (true) 
+		{
+			try 
+			{
 				Socket socket = serverSocket.accept();
 				updateMessage("Server get connection at port " + socket.getPort());				
 			
@@ -62,47 +70,60 @@ public class Broker extends ServerUI {
 				out.writeObject(replyAction);
 				out.flush();	
 				
-				if (state != 0) {
+				if (state != 0) 
+				{
 					//reject, close connection
 					socket.close();
 					in.close();
 					out.close();
-				} else {						
+				} 
+				else 
+				{						
 					// new client handle, communicate
-					if (type.equals(ClientType.PUBLISHER)) {
+					if (type.equals(ClientType.PUBLISHER)) 
+					{
 						pubAcceptedRequest(socket, in, out, joinAction);						
 						updateMessage("Accept pub request at port " + socket.getPort());			
 						
-						for (String name : subscribersTopicMap.keySet()) {
+						for (String name : subscribersTopicMap.keySet()) 
+						{
 							String key = name.toString();
 							String value = subscribersTopicMap.get(name).toString();
 							updateMessage(key + " " + value);
 						}						
 						
-					} else if (type.equals(ClientType.SUBSCRIBER)) {		
+					} 
+					else if (type.equals(ClientType.SUBSCRIBER)) 
+					{		
 						subAcceptedRequest(socket, in, out, joinAction);
 						updateMessage("Accept sub request at port " + socket.getPort());						
-						
-						for (String name : subscribersTopicMap.keySet()) {
+						for (String name : subscribersTopicMap.keySet()) 
+						{
 							String key = name.toString();
 							String value = subscribersTopicMap.get(name).toString();
 							updateMessage(key + " " + value);
 						}
 					}					
 				}				
-			} catch (IOException e) {
+			} 
+			catch (IOException e) 
+			{
 				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
+			} 
+			catch (ClassNotFoundException e) 
+			{
 				e.printStackTrace();
 			}
 		}
 	}
 	
-	private long generaetID() {
+	private long generaetID() 
+	{
 		return id++;
 	}
 	
-	public void pubAcceptedRequest(Socket socket, ObjectInputStream in, ObjectOutputStream out, JoinAction joinAction) {
+	public void pubAcceptedRequest(Socket socket, ObjectInputStream in, ObjectOutputStream out, JoinAction joinAction) 
+	{
 		locations.add(joinAction.getLocation());	
 		
 		Set<subClientHandler> subscribers = new HashSet<subClientHandler>();
@@ -110,7 +131,8 @@ public class Broker extends ServerUI {
 		
 		pubClientHandler clientHandler = new pubClientHandler(generaetID(), socket, in, out, subscribers, joinAction.getLocation());				
 		
-		for (int i = 0; i < Config.MAX_CONNECTIONS; i++) {
+		for (int i = 0; i < Config.MAX_CONNECTIONS; i++) 
+		{
 			if (clientHandlers[i] != null)
 				continue;
 			clientHandlers[i] = clientHandler;
@@ -119,7 +141,8 @@ public class Broker extends ServerUI {
 		}		
 	}
 	
-	public void subAcceptedRequest(Socket socket, ObjectInputStream in, ObjectOutputStream out, JoinAction joinAction) {
+	public void subAcceptedRequest(Socket socket, ObjectInputStream in, ObjectOutputStream out, JoinAction joinAction) 
+	{
 		
 		subClientHandler clientHandler = new subClientHandler(generaetID(), socket, in, out, joinAction.getLocation());			
 		
@@ -127,10 +150,13 @@ public class Broker extends ServerUI {
 		subscribers.add(clientHandler);
 		subscribersTopicMap.put(joinAction.getLocation(), subscribers);						
 		
-		for (int i = 0; i < Config.MAX_CONNECTIONS; i++) {
-			if (clientHandlers[i] instanceof pubClientHandler) {
+		for (int i = 0; i < Config.MAX_CONNECTIONS; i++) 
+		{
+			if (clientHandlers[i] instanceof pubClientHandler) 
+			{
 				pubClientHandler pub = (pubClientHandler) clientHandlers[i];
-				if (!(pub.getLocation().equals(joinAction.getLocation()))) {
+				if (!(pub.getLocation().equals(joinAction.getLocation()))) 
+				{
 					continue;
 				}
 				pub.setSub(subscribers);
@@ -138,7 +164,8 @@ public class Broker extends ServerUI {
 			}
 		}
 		
-		for (int i = 0; i < Config.MAX_CONNECTIONS; i++) {
+		for (int i = 0; i < Config.MAX_CONNECTIONS; i++) 
+		{
 			if (clientHandlers[i] != null)
 				continue;
 			clientHandlers[i] = clientHandler;
@@ -147,63 +174,83 @@ public class Broker extends ServerUI {
 		}
 	}
 	
-	public int checkConnect(JoinAction act) {
+	public int checkConnect(JoinAction act) 
+	{
 		boolean check = true;		
 		boolean check_sub = false;
 		int state;
 		int i;
-		for (i = 0; i < clientHandlers.length; i++) {	
+		for (i = 0; i < clientHandlers.length; i++) 
+		{	
 			if (clientHandlers[i] == null) 
 				break;		
 		}
-		if (i == Config.MAX_CONNECTIONS) {
+		if (i == Config.MAX_CONNECTIONS) 
+		{
 			return 1;
 		}
 		
-		if (act.getClientType().equals(ClientType.PUBLISHER)) {
-			for (String s : locations) {
+		if (act.getClientType().equals(ClientType.PUBLISHER)) 
+		{
+			for (String s : locations) 
+			{
 				if (s.equals(act.getLocation()))
 					return 2;
 			}
-		} else if (act.getClientType().equals(ClientType.SUBSCRIBER)) {
-			for (String s : locations) {
-				if (s.equals(act.getLocation())) {
+		} 
+		else if (act.getClientType().equals(ClientType.SUBSCRIBER)) 
+		{
+			for (String s : locations) 
+			{
+				if (s.equals(act.getLocation()))
+				{
 					check_sub = true;
 					break;
 				}			
 			}
 		}
-		if (act.getClientType().equals(ClientType.SUBSCRIBER)) {
+		if (act.getClientType().equals(ClientType.SUBSCRIBER)) 
+		{
 			state = (check_sub)?0:3;
-		} else {
+		} 
+		else 
+		{
 			state = (check)?0:3;
 		}
 		return state;		
 	}
 	
 	
-	public void disconnect(ClientHandler handler) {
-		for (int i = 0; i < Config.MAX_CONNECTIONS; i++) {
-			if (clientHandlers[i] != null && clientHandlers[i].equals(handler)) {
+	public void disconnect(ClientHandler handler) 
+	{
+		for (int i = 0; i < Config.MAX_CONNECTIONS; i++) 
+		{
+			if (clientHandlers[i] != null && clientHandlers[i].equals(handler)) 
+			{
 				clientHandlers[i] = null;
 				break;
 			}
 		}		
 		
-		if (handler instanceof subClientHandler) {			
+		if (handler instanceof subClientHandler) 
+		{			
 			subClientHandler sub = (subClientHandler) handler;		
 			Set<subClientHandler> subscribers = subscribersTopicMap.get(sub.getLocation());				
 			
-			for (subClientHandler s : subscribers) {
-				if (s.equals(sub)) {
+			for (subClientHandler s : subscribers) 
+			{
+				if (s.equals(sub)) 
+				{
 					subscribers.remove(sub);
 					break;
 				}			
 			}
 			subscribersTopicMap.put(sub.getLocation(), subscribers);	
 			
-			for (int i = 0; i < Config.MAX_CONNECTIONS; i++) {
-				if (clientHandlers[i] instanceof pubClientHandler && clientHandlers[i].getLocation().equals(sub.getLocation())) {
+			for (int i = 0; i < Config.MAX_CONNECTIONS; i++) 
+			{
+				if (clientHandlers[i] instanceof pubClientHandler && clientHandlers[i].getLocation().equals(sub.getLocation())) 
+				{
 					pubClientHandler pub = (pubClientHandler) clientHandlers[i];
 					pub.setSub(subscribers);
 					clientHandlers[i] = pub;
@@ -211,14 +258,18 @@ public class Broker extends ServerUI {
 				}
 			}			
 			
-		} else if (handler instanceof pubClientHandler) {
+		} else if (handler instanceof pubClientHandler) 
+		{
 			pubClientHandler pub = (pubClientHandler) handler;				
 			locations.remove(pub.getLocation());				
 			
 			Set<subClientHandler> subscribers = pub.getSub();			
-			for (subClientHandler sub : subscribers) {
-				for (int i = 0; i < Config.MAX_CONNECTIONS; i++) {
-					if (sub.equals(clientHandlers[i])) {
+			for (subClientHandler sub : subscribers) 
+			{
+				for (int i = 0; i < Config.MAX_CONNECTIONS; i++) 
+				{
+					if (sub.equals(clientHandlers[i])) 
+					{
 						clientHandlers[i] = null;
 					}
 				}
@@ -226,11 +277,13 @@ public class Broker extends ServerUI {
 		}			
 	}
 	
-	public void quit() {
+	public void quit() 
+	{
 		
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) 
+	{
 		Broker bro = new Broker();
 	}
 }
